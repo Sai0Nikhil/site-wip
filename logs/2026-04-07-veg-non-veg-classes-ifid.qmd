@@ -1,25 +1,23 @@
 ---
 title: "Veg/Non-Veg Classes in IFID"
-subtitle: "Taxonomy scaffolding for dietary status tags in the Indian Food Informatics Data Project"
+subtitle: "Taxonomy scaffolding for dietary status tags in the Ingredient Function Identity Database"
 author:
   - name: Sai Nikhil Vukka
     affiliation: ISRL
 date: 2026-04-07
 date-format: "DD MMMM YYYY"
 categories: [ifid, taxonomy, dietary-classes, fssai, metadata]
-draft: true
-draft-mode: visible
 ---
 
 ## 1. Why this question matters for IFID
 
-The EMF core assigns every ingredient a stable identity coordinate — E (Energy), M (Matter), F (Function), D (Divorce Score), and Zone — derived from biological source and functional role. This is correct for trade, HS classification, and regulatory alignment. It is deliberately silent on one question: *what was this made from, and does that matter to the consumer eating it?*
+The EMF core assigns every ingredient a stable identity coordinate — E (essence), M (morphology), F (function), D (distance), and Zone — derived from biological source and functional role. This is correct for trade, HS classification, and regulatory alignment. It is deliberately silent on one question: *what was this made from, and does that matter to the consumer eating it?*
 
 For most labelling questions, EMF's silence on origin is a feature, not a defect. Glycerin is glycerin: same E, same M, same F, same D, regardless of whether it came from tallow or soya. That coordinate stability is precisely what makes EMF useful for customs and taxation. But the same stability becomes a liability the moment a consumer, a religious community, or a legal obligation requires the question of source to be answered — not the question of what the ingredient *does*, but where it *came from*.
 
-The glycerin example makes this concrete. EMF places animal-derived and plant-derived glycerin at the same coordinate. That is correct for HS classification. It is a problem for vegan compliance, Ram Gau Raksha Dal mandates[^1], and any standard where the question is *what was this made from*, not *what does it do*. The extension layer exists to answer that question without touching the core identity.
+The glycerin example makes this concrete. EMF places animal-derived and plant-derived glycerin at the same coordinate. That is correct for HS classification. It is a problem for vegan compliance, Ram Gau Raksha Dal mandates, and any standard where the question is *what was this made from*, not *what does it do*. The extension layer exists to answer that question without touching the core identity.
 
-This is not a theoretical gap. In December 2021, the Delhi High Court [^1] directed FSSAI and the Central Government to ensure full and complete disclosure of all ingredients by their plant or animal origin, irrespective of percentage used in the product. The Court held that rights under Article 21 (protection of life and personal liberty) and Article 25 (freedom of conscience and religion) are directly implicated by what is placed on the consumer's plate. An ingredient coded only by its function — not its source — cannot satisfy this obligation. IFID, if it is to serve food businesses operating under Indian law, must be able to resolve the source question at ingredient level, not leave it to be re-answered product by product.
+This is not a theoretical gap. In December 2021, the Delhi High Court (*Ram Gaua Raksha Dal v. Union of India & Ors*, W.P.(C) 12055/2021) directed FSSAI and the Central Government to ensure full and complete disclosure of all ingredients by their plant or animal origin, irrespective of percentage used in the product. The Court held that rights under Article 21 (protection of life and personal liberty) and Article 25 (freedom of conscience and religion) are directly implicated by what is placed on the consumer's plate. An ingredient coded only by its function — not its source — cannot satisfy this obligation. IFID, if it is to serve food businesses operating under Indian law, must be able to resolve the source question at ingredient level, not leave it to be re-answered product by product.
 
 The plugin architecture log (April 2026) establishes the general design direction: EMF is the core, dietary classes are metadata layers attached to EMF canons. This log applies that direction specifically to the veg/non-veg question as understood in the Indian regulatory and social context.
 
@@ -52,7 +50,7 @@ These exclusions are significant and frequently misunderstood: a product contain
 
 **Covered:** All pre-packaged food sold in India. The declaration is mandatory irrespective of the percentage of the animal-derived ingredient in the food — a point FSSAI confirmed to the Delhi High Court in 2022 in the Ram Gaua Raksha Dal matter.
 
-**Extended to food service and e-commerce:** Restaurants, airlines, railways, and mobile catering units must display the veg/non-veg logo. E-commerce like (Swiggy, Zomato, etc.) must publish mandatory labelling information from applicable restaurants on their platforms.
+**Extended to food service and e-commerce:** Restaurants, airlines, railways, and mobile catering units must display the veg/non-veg logo. E-commerce operators (Swiggy, Zomato, etc.) must publish mandatory labelling information from applicable restaurants on their platforms.
 
 **Exempt categories:** Fresh fruits and vegetables; food served for immediate consumption in settings not covered by Chapter 3 of the Regulations; bulk packaging for industrial or institutional use.
 
@@ -60,11 +58,24 @@ These exclusions are significant and frequently misunderstood: a product contain
 
 1. It does not define degrees of vegetarianism. There is no regulatory symbol for lacto-vegetarian versus ovo-vegetarian versus lacto-ovo vegetarian. The green dot covers all of them without distinction.
 2. It does not address vegan status. An entirely plant-derived product processed using bone-char sugar, gelatin-fined wine, or animal-tested additives carries the green dot under current law.
-This gap is documented in litigation: the Delhi HC's Ram Gaua Raksha Dal judgment [^1] was triggered precisely because products carrying the green dot contained animal-derived E-codes with no source disclosure. The Court specifically cited E631 (Disodium Inosinate  commercially prepared from meat or fish, found in instant noodles and chips) as an example. Further documented instances include E120 (Carmine/Cochineal crushed insects, used as "natural colour" in juices and candies), E904 (Shellac — lac bug secretion, used as glazing agent on candies and fruits), Isinglass (fish bladder used as a processing aid to fine wine and beer; never listed as an ingredient), and Rennet (calf stomach enzyme — used in cheese and paneer without source declaration). In each case the product carried or was eligible for the green dot under current law.
-
-3. It does not define "processing aid" disclosure in a way that fully resolves source ambiguity. The <5% compound ingredient exemption (Regulation 2.2.2(d) of the 2011 framework) was the specific gap the Delhi HC directed FSSAI to close — but the regulatory text itself has not been amended to remove the ambiguity at source level.
+3. It does not address Jain dietary requirements (avoidance of root vegetables, certain additives derived from permitted animal sources under the vegetarian definition).
+4. It does not define "processing aid" disclosure in a way that fully resolves source ambiguity. The <5% compound ingredient exemption (Regulation 2.2.2(d) of the 2011 framework) was the specific gap the Delhi HC directed FSSAI to close — but the regulatory text itself has not been amended to remove the ambiguity at source level.
 
 The law, in short, gives India a binary: vegetarian or non-vegetarian, with a defined set of carve-outs. Everything above and below that binary — finer gradations, vegan status, Jain requirements — is left to market practice, third-party certification, and consumer interpretation.
+
+### 2A. Green Dot enforcement: strict regulation or systemic good faith?
+
+This is a question the log must answer directly, because it bears on what IFID's `diet:veg_fssai` tag actually certifies.
+
+**At the licensing and approval level, the Green Dot is a strict statutory obligation.** A food business operator that affixes the green symbol to a product containing non-FSSAI-permitted animal-derived ingredients is in violation of FSS (Labelling and Display) Regulations, 2020, and is liable to enforcement action under the Food Safety and Standards Act, 2006. FSSAI licensing assessors check product formulations against declared symbols as part of the initial approval process, and surveillance sampling — particularly for high-sensitivity categories such as flavourings, emulsifiers, and confectionery glazes — can trigger recall and penalty proceedings.
+
+**At the internal quality control (IQC) level, however, verification relies heavily on systemic trust rather than mandatory laboratory testing.** The mechanism by which an FBO demonstrates compliance for animal-source sub-ingredients — particularly those arriving as components of compound flavours, oleoresins, or emulsifier blends — is almost exclusively the Supplier Affidavit (also called a Supplier Declaration or Letter of Assurance). There is no FSSAI regulation that requires batch-by-batch laboratory confirmation of veg/non-veg status for intermediate ingredients. The FBO declares what it knows; what it knows is what its supplier told it in writing.
+
+This has a structural consequence. A supplier who provides a "Natural Strawberry Flavour" compound carrying a vegetarian declaration has, legally, transferred responsibility for source accuracy to themselves. The FBO relying on that declaration is, for regulatory purposes, in good standing — provided the declaration is in its files. This is systemic trust, not verified truth.
+
+**The <5% compound ingredient exemption compounds this gap.** Under Section 5.4(g) of the FSSAI Labelling Regulations (2020 update), compound ingredients that constitute less than 5% of the finished product are not required to have their sub-ingredients individually declared on the label. A "Natural Strawberry Flavour" node that is 3% of the finished product by weight need only be declared as "Natural Strawberry Flavour" — the carrier solvents, emulsifiers, and processing aids within that flavour compound are invisible to the consumer. This is the regulatory blind spot through which ingredients such as E120 (Carmine/Cochineal, insect-derived) can legally disappear inside a flavour blend and the product can still carry the green dot, because the FBO's label is technically compliant, even if the sub-ingredient's source would disqualify it under strict reading.
+
+**The implication for IFID:** The `diet:veg_fssai` tag, when assigned to an ingredient, certifies that the ingredient as defined meets the statutory definition. It does not certify that every FBO using that ingredient as a component of a compound has verified source provenance at the batch level. Zone 3 metadata (supplier-route-specific overrides) and the evidence-linking framework in Open Question 5.5 are precisely the tools needed to flag the difference between "this canon is vegetarian by definition" and "this SKU has verified vegetarian provenance end-to-end."
 
 ---
 
@@ -118,6 +129,7 @@ The binary in law does not match the plurality of choices Indians actually navig
 
 **Label reality in India:** No regulatory symbol. Third-party logos (Vegan Society UK, local vegan certification bodies) are used voluntarily. The category is growing in urban markets and among export-facing brands.
 
+**Relationship to IFID Vegan Plugin:** The V-Metadata Protocol v0.1 (April 2026 plugin architecture log) is the technical instrument for this class. It is the one class where a dedicated schema already exists; this log notes it as an open item pending publication of the vegan analysis log.
 
 ### 3.8 Pescetarian
 
@@ -127,7 +139,33 @@ The binary in law does not match the plurality of choices Indians actually navig
 
 ---
 
-## 4. What IFID will recognise (as of April 2026)
+## 4. Real-world cases where the Green Dot does not equal full compliance
+
+The two examples below are included to make the boundary problem concrete. Both illustrate the same structural gap: a product can legally carry the FSSAI green symbol while failing a strict Jain or vegan audit. IFID's Zone 3 metadata layer and the supplier-route override mechanism exist precisely to surface these cases.
+
+### 4.1 Varq (Silver Leaf): a process-based compliance failure
+
+Varq — the ultrathin edible silver or gold leaf applied to Indian mithai, paan, and ceremonial sweets — is classified by FSSAI as a food additive (INS 174/175 for silver/gold leaf respectively). It carries no animal-derived ingredient in the finished article. A mithai product carrying vark will, under current labelling law, qualify for the green dot.
+
+The compliance problem is historical but instructive: traditional varq production involved the laborious hammering of silver between layers of ox-gut membrane (specifically beef intestine), chosen for its pliability and consistent thickness. The silver leaf itself absorbed no animal matter, but the processing aid — the gut — was used throughout manufacture. Under any strict vegan or Jain reading, the process contamination alone would disqualify the ingredient. Yet because the gut is a processing aid and leaves no detectable residue in the finished product, no declaration was or is required under Indian labelling law.
+
+Post-2016, FSSAI issued guidelines explicitly encouraging — and in some interpretations mandating — the use of machine-made varq (produced without animal intestine membrane). Industry association compliance has been uneven. Certified machine-made varq from verified producers now exists in the market. The key IFID implication is this: the EMF canon for silver leaf (E174) is a single coordinate. The vegan and Jain status of a specific SKU using that ingredient depends entirely on **which production route** the supplier used — information that must live in Zone 3 supplier-route metadata, not in the canon itself.
+
+Varq is therefore the canonical Indian example for why Zone 3 metadata records exist. It is a case where the ingredient-as-defined is process-neutral, but the compliance verdict is route-specific.
+
+### 4.2 Bone-char processed sugar: high-risk node, geography-dependent priority
+
+Refined white sugar produced using bone-char filtration is the most commonly cited vegan-disqualifying processing aid in global supply chains. Bone char (calcined animal bone, typically cattle) is used as a decolourising and filtration medium in cane sugar refining. No bone material remains in the finished sugar, but the processing contact is sufficient to disqualify it under most vegan certification standards.
+
+**Indian supply chain context:** This is an important calibration point. Indian sugar refineries predominantly use one of two alternative processes: **Sulphitation** (treatment with sulphur dioxide gas to decolourise the juice) or **Ion-Exchange Resin** columns for demineralisation. Bone-char use is not standard practice in domestic Indian sugar refining and is not required at any stage by Indian industry norms. For **domestic Indian supply chains**, bone-char sugar is therefore a lower-priority risk node — the default assumption for Indian-origin refined sugar can be `diet:vegan = likely` pending supplier confirmation.
+
+**Imported sugar is a different matter.** Refineries in the United States, certain Caribbean producers, and some European processors have historically used bone-char in parts of their refining chain. For an IFID-tagged ingredient node covering imported refined cane sugar, `diet:vegan = indeterminate` is the correct assignment until a supplier-specific declaration is on file. The risk is real and the verification gap is non-trivial for export-facing Indian FBOs sourcing from US or Caribbean refineries.
+
+**IFID tagging recommendation:** The `diet:vegan` field for refined white sugar (generic canon) should carry the value `indeterminate` with a note distinguishing domestic-origin (`likely: verify via Sulphitation/IER confirmation`) from import-origin (`indeterminate: bone-char route unconfirmed`). The Jain plugin does not have a separate position on bone-char, since sugar is not a root vegetable and the processing-aid question is outside the core Jain avoidance framework; however, strictly observant Jain communities that follow broader ahimsa processing standards may apply the same disqualification logic as vegan standards. This edge case should be flagged in the Jain plugin ruleset documentation.
+
+---
+
+## 5. What IFID will recognise (as of April 2026)
 
 The following dietary status tags will be available as metadata attached at the EMF canon level in IFID. Each tag is a **plugin field**, not a core EMF coordinate. The core is not modified.
 
@@ -138,7 +176,7 @@ The following dietary status tags will be available as metadata attached at the 
 | Lacto-vegetarian | `diet:lacto_veg` | `diet:veg_fssai` AND no egg-derived ingredients | Yes |
 | Lacto-ovo vegetarian | `diet:lacto_ovo_veg` | `diet:veg_fssai` AND dairy permitted AND egg-derived ingredients permitted | Yes |
 | Jain vegetarian | `diet:jain_veg` | `diet:lacto_veg` (dairy variant) AND no root vegetables AND no excluded additives per Jain convention | Partial — canon-level for root vegetables; requires ruleset for additive edge cases |
-| Vegan | `diet:vegan` | No animal products or by-products in ingredients, processing aids, or carriers;| Yes — via V-metadata plugin; indeterminate states possible |
+| Vegan | `diet:vegan` | No animal products or by-products in ingredients, processing aids, or carriers; see V-Metadata Protocol v0.1 | Yes — via V-metadata plugin; indeterminate states possible |
 | Non-veg (fish only) | `diet:pescetarian_ok` | Animal-source ingredient is fish or seafood only; no other animal flesh | Partial — useful for SKU-level aggregation |
 
 ### Boundary rules
@@ -154,7 +192,8 @@ The following dietary status tags will be available as metadata attached at the 
 - **Honey:** `diet:veg_fssai` — carved out. `diet:vegan` = No.
 - **Rennet (animal):** `diet:nonveg`. Microbial or fermentation-derived rennet: `diet:veg_fssai`.
 - **Onion powder / garlic extract:** `diet:veg_fssai` = Yes. `diet:jain_veg` = No.
-- **Bone-char processed sugar:** `diet:veg_fssai` = Yes (processing aid, not ingredient). `diet:vegan` = indeterminate / No depending on standard applied.
+- **Bone-char processed sugar:** `diet:veg_fssai` = Yes (processing aid, not ingredient). `diet:vegan` = indeterminate for imported sugar / likely for domestic Indian origin (see Section 4.2).
+- **Silver leaf / Varq (E174):** `diet:veg_fssai` = Yes. `diet:vegan` and `diet:jain_veg` = indeterminate unless supplier confirms machine-made (non-intestine) production route (see Section 4.1).
 
 ### Tag assignment method
 
@@ -162,31 +201,30 @@ For Zone 1 and Zone 2 ingredients, tags are assigned at canon level by ISRL usin
 
 For Zone 3 functional tools (glazing agents, emulsifiers, carriers, processing aids), tags are assigned per supplier route, modelled as multiple metadata records on the same EMF node.
 
-A tag of indeterminate is a valid output. It means: the canon could fall into either class; source or process evidence is required from the food business operator before a verdict can be issued. The two clearest examples are Glycerin (E422) identical EMF coordinates whether derived from tallow or soya oil, verdict is indeterminate until supplier declares origin and L-Cysteine (E920) same canon whether sourced from duck feathers or produced synthetically, again indeterminate until evidence is supplied.
+A tag of `indeterminate` is a valid output. It means: the canon could fall into either class; source or process evidence is required from the food business operator before a verdict can be issued.
 
 ---
 
-## 5. Open questions
+## 6. Open questions
 
-**5.1 The vegan boundary**
-The vegan class is the most contested and technically complex. The vegan analysis provides a schema, but the ruleset for processing aids (bone-char sugar, gelatin fining, animal-tested additives) is not yet fully specified for the Indian market. This is the subject of a separate vegan analysis log, currently in preparation. Until that log is published, `diet:vegan` tags in IFID should be treated as provisional.
+**6.1 The vegan boundary**
+The vegan class is the most contested and technically complex. The V-Metadata Protocol v0.1 provides a schema, but the ruleset for processing aids (bone-char sugar, gelatin fining, animal-tested additives) is not yet fully specified for the Indian market. This is the subject of a separate vegan analysis log, currently in preparation. Until that log is published, `diet:vegan` tags in IFID should be treated as provisional.
 
-**5.2 Jain variation**
+**6.2 Jain variation**
 Jain dietary rules vary across communities (Digambara, Shvetambara, regional associations) in ways that are not captured by a single tag. The `diet:jain_veg` tag as defined here covers the consensus core (no root vegetables; lacto-vegetarian). Edge cases — multi-layer cooking restrictions, specific additive exclusions, night-eating rules — are out of scope for the current taxonomy and noted as requiring a dedicated Jain dietary plugin.
 
-**5.3 Processing aid disclosure gap**
-FSSAI's <5% compound ingredient exemption leaves a legal grey area for processing aids and carriers. The Delhi HC directed FSSAI to close this gap, but the regulatory text has not been amended as of the date of this log. IFID tags reflect what *should* be disclosed under the court's direction, not merely what current labelling regulations explicitly require. This distinction should be documented in any compliance guidance built on IFID outputs.
+**6.3 Processing aid disclosure gap**
+FSSAI's <5% compound ingredient exemption (Section 5.4(g)) leaves a legal grey area for processing aids and carriers. The Delhi HC directed FSSAI to close this gap, but the regulatory text has not been amended as of the date of this log. IFID tags reflect what *should* be disclosed under the court's direction, not merely what current labelling regulations explicitly require. This distinction should be documented in any compliance guidance built on IFID outputs.
 
-**5.4 Minimum common schema across plugins**
+**6.4 Minimum common schema across plugins**
 The plugin architecture log identifies the need for a minimum common interface so that `diet:veg_fssai`, `diet:vegan`, and future plugins (allergen, halal, Jain ruleset) can be composed without conflict. This schema has not been finalised. Until it is, each plugin carries its own field definitions.
 
-**5.5 Evidence linking and auditability**
-How a `diet:veg_fssai = true` or `diet:vegan = indeterminate` verdict is traced back to a supplier declaration, certificate, or test report is not yet specified.
+**6.5 Evidence linking and auditability**
+How a `diet:veg_fssai = true` or `diet:vegan = indeterminate` verdict is traced back to a supplier declaration, certificate, or test report is not yet specified. This is open for both this plugin and the V-Metadata Protocol. The Varq and bone-char cases in Section 4 make the stakes of this gap concrete — supplier-route claims without audit trails produce `indeterminate` verdicts that cannot be upgraded to `true` without an evidence linkage mechanism.
 
 ---
 
 ## References
-
 
 **Primary regulatory instrument:**
 Food Safety and Standards Authority of India. (2020). *Food Safety and Standards (Labelling and Display) Regulations, 2020*. Gazette of India, Extraordinary, Gazette ID CG-DL-E-10122020-223635, published 10 December 2020, operative 17 November 2021.
@@ -197,10 +235,25 @@ Food Safety and Standards Authority of India. (2020). *Food Safety and Standards
 **ISRL primary reference:**
 Vukka, Sai Nikhil & Lalitha A.R. (2026). "Regulatory Delta of Food Labelling Laws in India: A Comparative Analysis of the FSSAI 2011 and 2020 Regulations." *Zenodo*. <https://doi.org/10.5281/zenodo.18719394>
 
-[^1]: Ram Gaua Raksha Dal v. Union of India & Ors, W.P.(C) 12055/2021, High Court of Delhi (orders dated 9 Dec 2021, 22 Dec 2021, March 2022). 
-The Court directed FSSAI to ensure full disclosure of all ingredients by plant or animal origin, irrespective of percentage used. Rights under 
-Article 21 (life and liberty) and Article 25 (freedom of conscience and religion) were held to be directly implicated by undisclosed animal-derived ingredients.
+**Companion logs:**
+- Plugin Architecture & Global Dietary Classes (April 2026) — establishes the core-extensibility principle and V-Metadata Protocol v0.1.
+- EMF–Vegan Protocol v0.1 (Vukka & Lalitha A.R., 2026) — available in ISRL sandbox-research logs; vegan analysis log in preparation.
 
 ---
 
 *Log status: draft. Tags and boundary rules are provisional pending review by @lalithaar*
+
+---
+
+## PR #19 — Commit note
+
+**Changes in this revision:**
+
+1. **Section 2A added** — Formally answers the Green Dot enforcement question: strict at the licensing/approval level; supplier-affidavit-dependent at IQC level. Documents the Section 5.4(g) <5% compound ingredient exemption as the structural blind spot allowing ingredients like E120 to disappear inside a flavour node.
+
+2. **Section 4 added** — "Real-world cases where the Green Dot does not equal full compliance." Covers Varq (primary Indian process-based example; historical ox-gut membrane use; Zone 3 route-specific metadata implication) and bone-char sugar (US/Caribbean import-origin: `indeterminate`; domestic Indian origin: `likely` given Sulphitation/IER predominance).
+
+3. **Boundary rules table updated** — Varq (E174) and bone-char sugar now have explicit entries with geography-differentiated vegan verdicts.
+
+4. **Section 5.3 renumbered to 6.3** — Open questions section renumbered to accommodate new Section 4. Cross-reference to Section 4 added in 6.5.
+
